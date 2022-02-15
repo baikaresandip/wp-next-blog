@@ -1,8 +1,33 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import React from "react";
+import Head from "next/head";
+import Image from "next/image";
+import styles from "../styles/Home.module.css";
+import FeaturedImage from "../components/FeaturedImage";
+import Navigation from "../components/Nav/Navigation";
+import Footer from "../components/Footer/Footer";
+import Link from "next/link";
 
-export default function Home() {
+const shimmer = (w, h) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#333" offset="20%" />
+      <stop stop-color="#222" offset="50%" />
+      <stop stop-color="#333" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#333" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`;
+const toBase64 = (str) =>
+  typeof window === "undefined"
+    ? Buffer.from(str).toString("base64")
+    : window.btoa(str);
+export default function Home({ posts }) {
+  // console.log(posts);
+  posts?.map((post) => console.log(post.id));
+
   return (
     <div className={styles.container}>
       <Head>
@@ -12,58 +37,69 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
+        <Navigation />
         <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
+          Welcome to <a href="https://nextjs.org">Sandy's Blog!</a>
         </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+        <div class="grid grid-rows-4 grid-flow-col gap-4 sm:grid-rows-1  md:grid-rows-3">
+          {posts.length &&
+            posts.slice(0, 6).map((post) => {
+              return (
+                <div
+                  key={post.id}
+                  className=" rounded overflow-hidden shadow-lg my-2"
+                >
+                  <div className="px-6 py-4">
+                    {post.featured_image_src && (
+                      <Image
+                        src={post.featured_image_src}
+                        alt="featured image"
+                        className="w-full"
+                        width="500"
+                        height="350"
+                        layout="responsive"
+                        blurDataURL={`data:image/svg+xml;base64,${toBase64(
+                          shimmer(700, 475)
+                        )}`}
+                      />
+                    )}
+                    <div className="font-bold text-xl mb-2">
+                      <Link href={`/blog/${post.slug}`}>
+                        {post.title.rendered}
+                      </Link>
+                    </div>
+                    <p className="text-grey-darker text-base">
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: post.excerpt.rendered,
+                        }}
+                      ></div>
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
         </div>
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <Footer />
     </div>
-  )
+  );
 }
+
+export async function getServerSideProps() {
+  // Fetch data from external API
+  const res = await fetch(`http://www.wpdemo.local/wp-json/wp/v2/posts/`);
+  const posts = await res.json();
+
+  // Pass data to the page via props
+  return { props: { posts } };
+}
+
+const getMediaUrl = async (mediaId) => {
+  const mediaData = await fetch(
+    "http://www.wpdemo.local/wp-json/wp/v2/media/" + { mediaId }
+  );
+  const media = await mediaData.json();
+  return media.guid?.rendered;
+};
