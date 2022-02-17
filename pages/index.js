@@ -1,29 +1,14 @@
 import React from "react";
 import Head from "next/head";
+import Link from "next/link";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import FeaturedImage from "../components/FeaturedImage";
 import Navigation from "../components/Nav/Navigation";
 import Footer from "../components/Footer/Footer";
-import Link from "next/link";
+import BlogItem from "../components/Blog/BlogItem";
+import Layout from "../components/Layout/Layout";
 
-const shimmer = (w, h) => `
-<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <linearGradient id="g">
-      <stop stop-color="#333" offset="20%" />
-      <stop stop-color="#222" offset="50%" />
-      <stop stop-color="#333" offset="70%" />
-    </linearGradient>
-  </defs>
-  <rect width="${w}" height="${h}" fill="#333" />
-  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
-  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
-</svg>`;
-const toBase64 = (str) =>
-  typeof window === "undefined"
-    ? Buffer.from(str).toString("base64")
-    : window.btoa(str);
 export default function Home({ posts }) {
   // console.log(posts);
   posts?.map((post) => console.log(post.id));
@@ -36,53 +21,17 @@ export default function Home({ posts }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <Navigation />
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Sandy's Blog!</a>
+      <Layout>
+        <h1 class="font-medium leading-tight text-5xl mt-0 mb-2 text-blue-600 text-center">
+          Welcome to Sandy's Blog!
         </h1>
         <div class="grid grid-rows-4 grid-flow-col gap-4 sm:grid-rows-1  md:grid-rows-3">
           {posts.length &&
             posts.slice(0, 6).map((post) => {
-              return (
-                <div
-                  key={post.id}
-                  className=" rounded overflow-hidden shadow-lg my-2"
-                >
-                  <div className="px-6 py-4">
-                    {post.featured_image_src && (
-                      <Image
-                        src={post.featured_image_src}
-                        alt="featured image"
-                        className="w-full"
-                        width="500"
-                        height="350"
-                        layout="responsive"
-                        blurDataURL={`data:image/svg+xml;base64,${toBase64(
-                          shimmer(700, 475)
-                        )}`}
-                      />
-                    )}
-                    <div className="font-bold text-xl mb-2">
-                      <Link href={`/blog/${post.slug}`}>
-                        {post.title.rendered}
-                      </Link>
-                    </div>
-                    <p className="text-grey-darker text-base">
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: post.excerpt.rendered,
-                        }}
-                      ></div>
-                    </p>
-                  </div>
-                </div>
-              );
+              return <BlogItem key={post.id} post={post} />;
             })}
         </div>
-      </main>
-
-      <Footer />
+      </Layout>
     </div>
   );
 }
@@ -95,11 +44,3 @@ export async function getServerSideProps() {
   // Pass data to the page via props
   return { props: { posts } };
 }
-
-const getMediaUrl = async (mediaId) => {
-  const mediaData = await fetch(
-    "http://www.wpdemo.local/wp-json/wp/v2/media/" + { mediaId }
-  );
-  const media = await mediaData.json();
-  return media.guid?.rendered;
-};

@@ -3,6 +3,9 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import Head from "next/head";
 import Link from "next/link";
+import Navigation from "../../components/Nav/Navigation";
+import Layout from "../../components/Layout/Layout";
+import Author from "../../components/Author/Author";
 
 function SingleBlog(post) {
   const router = useRouter();
@@ -13,23 +16,28 @@ function SingleBlog(post) {
         <title> {post.title.rendered} </title>
         <meta content="" />
       </Head>
-      <main>
-        <Link href="/" className="btn">
-          Back to Home
-        </Link>
-        <h1 className="h1"> {post.title.rendered} </h1>
+      <Layout>
+        <h1
+          className={
+            "font-medium leading-tight text-5xl mt-0 mb-2 text-blue-600"
+          }
+        >
+          {post.title.rendered}
+        </h1>
         <span> {post.date} </span>
+        <div className="">
+          {post.featured_image_src ? (
+            <Image src={post.featured_image_src} width={1024} height={500} />
+          ) : null}
 
-        {post.featured_image_src ? (
-          <Image src={post.featured_image_src} width={1024} height={500} />
-        ) : null}
-
-        <div
-          dangerouslySetInnerHTML={{
-            __html: post.content.rendered,
-          }}
-        ></div>
-      </main>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: post.content.rendered,
+            }}
+          ></div>
+        </div>
+        <Author />
+      </Layout>
     </>
   );
 }

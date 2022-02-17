@@ -1,6 +1,6 @@
 module.exports = {
   reactStrictMode: true,
   images: {
-    domains: ["www.wpdemo.local"],
+    domains: ["www.wpdemo.local", "www.gravatar.com", "mdbootstrap.com"],
   },
 };
