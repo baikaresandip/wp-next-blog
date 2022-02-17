@@ -1,6 +1,18 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a [WordPress](https://wordpress.org) and [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
+
+This is simple implementation of Wordpress Nextjs Blog. This Nextjs application usage WordPress as backend (WP-REST API ) headless data and Nextjs as frontend.
+
+### Setup
+
+Clone this repo with below git command
+
+```bash
+git clone https://github.com/baikaresandip/wp-next-blog.git
+```
+
+Redirect to your blog folder with `cd wp-next-blog` command.
 
 First, run the development server:
 
