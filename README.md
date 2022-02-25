@@ -17,6 +17,10 @@ Redirect to your blog folder with `cd wp-next-blog` command.
 First, run the development server:
 
 ```bash
+# To install npm packages
+npm install
+
+# To run 
 npm run dev
 # or
 yarn dev
